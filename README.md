@@ -1,7 +1,6 @@
 # Python Minesweeper
 
-Simple Python minesweeper for cmd.
-:snake: Written on Python 3.9.0
+Simple Python minesweeper for cmd. Written on Python 3.9.0
 
 ## Requirements
 
