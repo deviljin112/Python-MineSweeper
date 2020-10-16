@@ -1,5 +1,8 @@
 import random
+from colorama import init
 from prettytable import PrettyTable
+
+init()
 
 combos = [
     [0, -1],
@@ -84,22 +87,18 @@ def reveal_empty(p_board, g_board, y, x):
     return p_board
 
 
-def move(p_board, g_board, y, x):
-    if g_board[y][x] == 0:
-        p_board = reveal_empty(p_board, g_board, y, x)
+def move(p_board, g_board, y, x, flag):
+    if flag:
+        if p_board[y][x] == "-":
+            p_board[y][x] = "?"
+        else:
+            print("Invalid Move!")
+    else:
+        if g_board[y][x] == 0:
+            p_board = reveal_empty(p_board, g_board, y, x)
 
-    p_board[y][x] = g_board[y][x]
+        p_board[y][x] = g_board[y][x]
     return p_board
-
-
-def board_print(board):
-    table = PrettyTable()
-    table.header = False
-    table.field_names = [f"{i}" for i in range(len(board[0]))]
-    for x in board:
-        table.add_row(x)
-
-    print(table)
 
 
 def check_win(p_board, g_board):
@@ -107,12 +106,12 @@ def check_win(p_board, g_board):
     win = False
 
     remaining = 0
-    for i in p_board:
-        for j in i:
-            if j == "X":
+    for i in range(len(p_board)):
+        for j in range(len(p_board[i])):
+            if p_board[i][j] == "X":
                 var = True
                 win = False
-            elif j == "-" and g_board[i][j] != "X":
+            elif p_board[i][j] == "-" and g_board[i][j] != "X":
                 remaining += 1
 
     if remaining == 0:
@@ -120,6 +119,34 @@ def check_win(p_board, g_board):
         win = True
 
     return var, win
+
+
+class bcolors:
+    RED = "\033[31m"
+    CYAN = "\033[36m"
+    END = "\033[39m"
+
+
+def board_print(board):
+    table = PrettyTable()
+    table.header = True
+    table.title = f"{bcolors.CYAN}Coordinates{bcolors.END}"
+    table.field_names = [f"{bcolors.RED}-{bcolors.END}"] + [
+        f"{bcolors.RED}{i}{bcolors.END}" for i in range(len(board[0]))
+    ]
+
+    temp_board = [[0] * len(board[0]) for _ in range(len(board))]
+    for i in range(len(board)):
+        for j in range(len(board[i])):
+            if board[i][j] == 0:
+                temp_board[i][j] = " "
+            else:
+                temp_board[i][j] = board[i][j]
+
+    for x in range(len(temp_board)):
+        table.add_row([f"{bcolors.RED}{x}{bcolors.END}"] + temp_board[x])
+
+    print(table)
 
 
 def main():
@@ -134,14 +161,18 @@ def main():
                 ["-"] * (len(hidden_board[0])) for _ in range(len(hidden_board))
             ]
 
-            board_print(hidden_board)
+            # board_print(hidden_board)
             board_print(player_board)
 
             playing = True
             while playing:
                 print("Choose a position on the grid.")
+                print("To flag a position prefix your position with 'f'.")
                 print("Or just say 'exit'.")
-                print("Format 'y x'.")
+                print("Format #1 'y x'.")
+                print("Format #2 'f y x'.")
+
+                flag = False
 
                 try:
                     p_choice = input("=> ")
@@ -151,15 +182,27 @@ def main():
                         break
                     else:
                         for i in p_choice:
-                            if i != " ":
+                            if i != " " and i != "f":
                                 move_choice.append(i)
+
+                            if i == "f":
+                                flag = True
 
                     y = int(move_choice[0])
                     x = int(move_choice[1])
+
+                    if not (
+                        y < len(player_board)
+                        and y >= 0
+                        and x < len(player_board[0])
+                        and x >= 0
+                    ):
+                        raise ValueError
+
                 except:
                     print("Please only use integers in the specified format!")
                 else:
-                    player_board = move(player_board, hidden_board, y, x)
+                    player_board = move(player_board, hidden_board, y, x, flag)
                     board_print(player_board)
                     var, win = check_win(player_board, hidden_board)
 
