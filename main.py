@@ -121,18 +121,16 @@ def check_win(p_board, g_board):
     return var, win
 
 
-class bcolors:
+def board_print(board):
     RED = "\033[31m"
     CYAN = "\033[36m"
     END = "\033[39m"
 
-
-def board_print(board):
     table = PrettyTable()
     table.header = True
-    table.title = f"{bcolors.CYAN}Coordinates{bcolors.END}"
-    table.field_names = [f"{bcolors.RED}-{bcolors.END}"] + [
-        f"{bcolors.RED}{i}{bcolors.END}" for i in range(len(board[0]))
+    table.title = f"{CYAN}Coordinates{END}"
+    table.field_names = [f"{RED}-{END}"] + [
+        f"{RED}{i}{END}" for i in range(len(board[0]))
     ]
 
     temp_board = [[0] * len(board[0]) for _ in range(len(board))]
@@ -144,7 +142,7 @@ def board_print(board):
                 temp_board[i][j] = board[i][j]
 
     for x in range(len(temp_board)):
-        table.add_row([f"{bcolors.RED}{x}{bcolors.END}"] + temp_board[x])
+        table.add_row([f"{RED}{x}{END}"] + temp_board[x])
 
     print(table)
 
